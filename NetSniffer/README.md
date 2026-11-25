@@ -19,7 +19,7 @@ Unauthorized network sniffing is illegal.
 * Clean output fomatting with timestamps.
 * Graceful exit when interrupted (Crl+C)
 
-### Perequisites 
+### Prerequisites 
 *** Python 3.x ** installed 
 * *** kali Linux ** (or any Linux distribution ).
 * ** Root privileges** 
