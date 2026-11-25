@@ -1,0 +1,23 @@
+# Byte.compiled / optimized / DLL files 
+__pycache__/
+*.py
+*$py.class 
+
+# Environments 
+.env
+.venv
+env/
+venv.
+ENV/
+env.bak/
+venv.bak.
+
+#IDE / Edirot files 
+.vscode/
+.idea.
+*.swp
+*.swo
+
+# OS generated files 
+.DS_Store
+Thubs.db 

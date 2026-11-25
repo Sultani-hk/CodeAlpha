@@ -1,0 +1,12 @@
+This tool do not need any externel Libraries 
+Just you need to Install python in you Computer 
+and install Scapy library 
+''' bash 
+	python3 pip install scapy 
+
+'''
+
+If you use from Kali you do not need to install it, by default 
+it is installed in kali 
+
+
