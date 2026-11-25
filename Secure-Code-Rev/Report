@@ -1,1 +1,67 @@
+Secure Coding Review Report
+Name: [ Rahmatullah Sultani ]  |  Date: November 25, 2026  |  Task 3: Secure Coding Review
 
+1. Scope
+•	Language: Python 3
+•	Application audited: app.py, a small sample script with a user lookup (SQLite), a ping utility, password hashing and a code runner.
+•	Goal: Identify security vulnerabilities, recommend best practices and document remediation steps.
+2. Method
+  1.	Static analysis: ran Bandit (pip install bandit, then bandit app.py).
+  2.	Manual review: read each function and traced where user input flows and whether it is validated.
+  3.	Severity rating: High, Medium or Low, based on how easily the flaw can be exploited and the damage it could cause.
+  Bandit output: [Paste your Bandit terminal output or a screenshot here.]
+3. Summary of Findings
+  #	Issue	File:Line	Severity	Typical Bandit ID
+  1	Hardcoded password	app.py:3	High	B105
+  2	SQL injection (string-built query)	app.py:7	High	B608
+  3	Command injection (shell=True)	app.py:11	High	B602
+  4	Weak hashing (MD5)	app.py:14	Medium	B324
+  5	Arbitrary code execution (eval)	app.py:17	High	B307
+  4. Detailed Findings and Remediation
+4.1 Hardcoded password (High)
+  Risk: Anyone with access to the source code or repository can read the secret.
+  Before:
+  PASSWORD = "admin123"
+  After:
+  import os
+  PASSWORD = os.environ["APP_PASSWORD"]
+4.2 SQL injection (High)
+  Risk: An input like ' OR '1'='1 changes the query and can expose or modify the whole database.
+  Before:
+    q = "SELECT * FROM users WHERE name = '" + name + "'"
+    return db.execute(q).fetchall()
+  After:
+    return db.execute("SELECT * FROM users WHERE name = ?", (name,)).fetchall()
+4.3 Command injection (High)
+  Risk: Input such as 8.8.8.8; del important.txt runs extra commands on the system.
+  Before:
+    return subprocess.run("ping " + host, shell=True)
+  After:
+    import ipaddress
+    ipaddress.ip_address(host)  # raises an error if not a valid IP
+    return subprocess.run(["ping", host])
+4.4 Weak password hashing (Medium)
+  Risk: MD5 is fast and broken, so stolen hashes can be cracked quickly.
+  Before:
+    return hashlib.md5(pw.encode()).hexdigest()
+  After:
+    import bcrypt  # pip install bcrypt
+    return bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
+4.5 Use of eval() (High)
+  Risk: eval executes any Python code the user supplies.
+  Before:
+    return eval(code)
+  After:
+    import ast
+    return ast.literal_eval(code)  # only accepts simple literals
+    If evaluation is not truly needed, remove the function.
+5. Secure Coding Best Practices
+•	Never trust user input: validate and sanitize it.
+•	Use parameterized queries for all database access.
+•	Keep secrets in environment variables or a secrets manager, never in code.
+•	Avoid eval, exec and shell=True.
+•	Hash passwords with bcrypt or argon2, with a salt.
+•	Apply least privilege and keep dependencies updated.
+•	Run static analysis (such as Bandit) regularly, and review code manually as well.
+6. Conclusion
+The review found 5 vulnerabilities, 4 High and 1 Medium. All can be fixed with small code changes, shown above. Combining an automated tool with manual review caught each issue and showed how user input becomes dangerous when it is not handled safely.
